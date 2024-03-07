@@ -1,0 +1,267 @@
+﻿@using DevExtreme.AspNet.Mvc
+@{
+    string cellFormat = "{0} $";
+}
+
+
+<h2>The use of calculateGroupValue and groupCellTemplate</h2>
+
+<script>
+    function calculateGroupValue(rowData) {
+        let sortValue = rowData.State === "California" ? this.sortOrder !== "desc" ? "aaa" : "zzz" : rowData.State;
+        let displayValue = rowData.State;
+        return sortValue + ";" + displayValue;
+    }
+
+    function groupCellTemplate(element, options) {
+        let column = options.column;
+        let displayValue = options.value.split(";")[1];
+        element.text(column.caption + ": " + displayValue);
+    }
+</script>
+
+@(Html.DevExtreme().DataGrid()
+    .ShowBorders(true)
+    .DataSource(new JS("customers"))
+    .KeyExpr("ID")
+    .Columns(columns =>
+    {
+        columns.Add().DataField("ID");
+        columns.Add().DataField("CompanyName");
+        columns.Add().DataField("Salary2020");
+        columns.Add().DataField("Salary2022");
+        columns.Add().DataField("Progression");
+        columns.Add().DataField("City");
+        columns.Add()
+            .DataField("State")
+            .GroupIndex(0)
+            .CalculateGroupValue(new JS("calculateGroupValue"))
+            .GroupCellTemplate(new JS("groupCellTemplate"));
+    })
+    .GroupPanel(p => p.Visible(true))
+    .Grouping(g => g.AutoExpandAll(true))
+.Summary(s => s.TotalItems(items =>
+{
+    items.Add()
+ .Column("CompanyName")
+ .SummaryType(SummaryType.Custom)
+ .CustomizeText(@<text>
+    function(data) { return "Total" ; }
+</text>);
+    items.Add()
+          .Column("ID")
+          .SummaryType(SummaryType.Sum).ShowInColumn("ID");
+
+    items.Add()
+           .Column("Salary2020")
+           .Name("Salary2022")
+           .SummaryType(SummaryType.Sum).ShowInColumn("Salary2022")
+           .DisplayFormat($"{cellFormat}");
+    items.Add()
+           .Column("Salary2022")
+           .SummaryType(SummaryType.Sum).ShowInColumn("Salary2022")
+           .DisplayFormat($"{cellFormat}");
+    items.Add()
+           .Column("City")
+           .Name("City")
+           .ShowInColumn("City");
+    items.Add()
+.Column("Progression")
+.SummaryType(SummaryType.Custom)
+.Name("Progression")
+.DisplayFormat("{0} %")
+.CustomizeText(@<text>
+    function(data) { return "10  %" ; }
+</text>);
+
+
+}
+     )
+    .GroupItems(items =>
+    {
+        items.Add()
+            .Column("City")
+        .SummaryType(SummaryType.Custom)
+        .DisplayFormat("{0}");
+        items.Add()
+            .Column("Salary2020")
+            .Name("Salary2020")
+            .SummaryType(SummaryType.Sum)
+            .AlignByColumn(true);
+        items.Add()
+           .Column("Salary2022")
+           .Name("Salary2022")
+           .SummaryType(SummaryType.Sum)
+           .AlignByColumn(true);
+        items.Add()
+           .Column("Progression")
+           .Name("Progression")
+          .ValueFormat(Format.Percent)
+           .SummaryType(SummaryType.Custom)
+           .AlignByColumn(true)
+           .DisplayFormat($"{cellFormat}");
+
+    }
+     ).CalculateCustomSummary("CalculateCustomGridSummary")
+))
+
+<script>
+
+    function CalculateCustomGridSummary(e) {
+        console.log("CalculateCustomSummary :"); console.log(e);
+    }
+    let customers = [{
+        ID: 1,
+        CompanyName: "Super Mart of the West",
+        Address: "702 SW 8th Street",
+        City: "Bentonville",
+        State: "Arkansas",
+        Salary2022 : 1500, Salary2020 : 500,
+        Progression : 200,StateNo: 5,
+        Zipcode: 72716,
+        Phone: "(800) 555-2797",
+        Fax: "(800) 555-2171",
+        Website: "http://www.nowebsitesupermart.com"
+    },
+    {
+        ID: 2,
+        CompanyName: "K&S Music",
+        Address: "1000 Nicllet Mall",
+        City: "Minneapolis",
+        State: "Minnesota",
+        Salary2022 : 1500,
+        Salary2020 : 500,
+        Progression : 200,StateNo: 1,
+        Zipcode: 55403,
+        Phone: "(612) 304-6073",
+        Fax: "(612) 304-6074",
+        Website: "http://www.nowebsitemusic.com"
+    },
+    {
+        ID: 3,
+        CompanyName: "Tom's Club",
+        Address: "999 Lake Drive",
+        City: "Issaquah",
+        State: "Washington",
+        Salary2022 : 1500,
+        Salary2020 : 500,
+        Progression : 200,StateNo: 2,
+        Zipcode: 98027,
+        Phone: "(800) 955-2292",
+        Fax: "(800) 955-2293",
+        Website: "http://www.nowebsitetomsclub.com"
+    },
+    {
+        ID: 4,
+        CompanyName: "E-Mart",
+        Address: "3333 Beverly Rd",
+        City: "Hoffman Estates",
+        State: "Illinois",
+        Salary2022 : 7500,
+        Salary2020 : 500,
+        Progression : 1200,StateNo: 3,
+        Zipcode: 60179,
+        Phone: "(847) 286-2500",
+        Fax: "(847) 286-2501",
+        Website: "http://www.nowebsiteemart.com"
+    },
+    {
+        ID: 5,
+        CompanyName: "Walters",
+        Address: "200 Wilmot Rd",
+        City: "Deerfield",
+        State: "Illinois",
+        Salary2022 : 1500,
+        Salary2020 : 500,
+        Progression : 200,StateNo: 3,
+        Zipcode: 60015,
+        Phone: "(847) 940-2500",
+        Fax: "(847) 940-2501",
+        Website: "http://www.nowebsitewalters.com"
+    },
+    {
+        ID: 6,
+        CompanyName: "StereoShack",
+        Address: "400 Commerce S",
+        City: "Fort Worth",
+        State: "Texas",
+        Salary2022 : 1500,
+        Salary2020 : 500,
+        Progression : 200,
+        StateNo: 4,
+        Zipcode: 76102,
+        Phone: "(817) 820-0741",
+        Fax: "(817) 820-0742",
+        Website: "http://www.nowebsiteshack.com"
+    },
+    {
+        ID: 7,
+        CompanyName: "Circuit Town",
+        Address: "2200 Kensington Court",
+        City: "Oak Brook",
+        State: "Illinois",
+        Salary2022 : 1500,
+        Salary2020 : 500,
+        Progression : 200,StateNo: 3,
+        Zipcode: 60523,
+        Phone: "(800) 955-2929",
+        Fax: "(800) 955-9392",
+        Website: "http://www.nowebsitecircuittown.com"
+    },
+    {
+        ID: 8,
+        CompanyName: "Premier Buy",
+        Address: "7601 Penn Avenue South",
+        City: "Richfield",
+        State: "Minnesota",
+        Salary2022 : 3000,
+        Salary2020 : 500,
+        Progression : 500,StateNo: 1,
+        Zipcode: 55423,
+        Phone: "(612) 291-1000",
+        Fax: "(612) 291-2001",
+        Website: "http://www.nowebsitepremierbuy.com"
+    },
+    {
+        ID: 9,
+        CompanyName: "ElectrixMax",
+        Address: "263 Shuman Blvd",
+        City: "Naperville",
+        State: "Illinois",
+        Salary2022 : 1500,
+        Salary2020 : 500,
+        Progression : 200,StateNo: 3,
+        Zipcode: 60563,
+        Phone: "(630) 438-7800",
+        Fax: "(630) 438-7801",
+        Website: "http://www.nowebsiteelectrixmax.com"
+    },
+    {
+        ID: 10,
+        CompanyName: "Video Emporium",
+        Address: "1201 Elm Street",
+        City: "Dallas",
+        State: "Texas",
+        Salary2022 : 3000,
+        Salary2020 : 500,
+        Progression : 500,StateNo: 4,
+        Zipcode: 75270,
+        Phone: "(214) 854-3000",
+        Fax: "(214) 854-3001",
+        Website: "http://www.nowebsitevideoemporium.com"
+    },
+    {
+        ID: 20,
+        CompanyName: "ACME",
+        Address: "2525 E El Segundo Blvd",
+        City: "El Segundo",
+        State: "California",
+        Salary2022 : 4500,
+        Salary2020 : 500,
+        Progression : 800,StateNo: 6,
+        Zipcode: 90245,
+        Phone: "(310) 536-0611",
+        Fax: "(310) 536-0612",
+        Website: "http://www.nowebsiteacme.com"
+    }];
+</script>
